@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HIGH / LOW · 카드 파티</title><style>
+:root{color-scheme:dark;--bg:#161025;--panel:#172731;--mint:#b5f2ce;--muted:#b7bdc9}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 18% 14%,#78224c 0,transparent 31%),radial-gradient(circle at 83% 22%,#125b69 0,transparent 34%),radial-gradient(circle at 50% 88%,#9b4d0b 0,transparent 38%),linear-gradient(145deg,#1b1029,#081d24 58%,#28130c);color:#f1f7f3;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+body:before{content:'🍺 🍷 🍶 🥂 🍻 🍾 🥃 🍺 🍷 🍶 🥂 🍻 🍾 🥃 🍺 🍷 🍶 🥂 🍻 🍾 🥃 🍺 🍷 🍶 🥂 🍻 🍾 🥃 🍺 🍷 🍶 🥂 🍻 🍾 🥃';position:fixed;inset:-70px;z-index:-1;font-size:clamp(48px,7vw,92px);line-height:1.72;letter-spacing:10px;word-spacing:18px;opacity:.48;transform:rotate(-7deg) scale(1.12);filter:saturate(2) contrast(1.18) drop-shadow(0 4px 5px #0008);pointer-events:none}
+body:after{content:'🍾  🍸  🍺  🍷  🥃  🍶  🥂  🍻  🍾  🍸  🍺  🍷  🥃  🍶  🥂  🍻';position:fixed;inset:-20px -80px;z-index:-1;font-size:clamp(38px,5.5vw,72px);line-height:2.25;letter-spacing:34px;opacity:.3;transform:rotate(9deg);filter:saturate(2);pointer-events:none}
+button,input,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:14px;padding:14px 20px;font-weight:750;background:var(--mint);color:#16372b;transition:transform .15s}
+button:hover{transform:translateY(-2px)}
+button:disabled{opacity:.4;cursor:default;transform:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #e8c778;outline-offset:3px}
+.ghost{background:#ffffff0c;color:#d7e7df;border:1px solid #ffffff20}
+.small{padding:9px 12px;font-size:13px}
+.wrap{max-width:1000px;margin:auto;padding:28px 22px 40px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.brand{font-size:19px;font-weight:900;letter-spacing:2px}
+.brand span{color:var(--mint)}
+.eyebrow{font-size:11px;letter-spacing:3px;color:var(--mint);font-weight:800}
+.muted{color:var(--muted);font-size:14px;line-height:1.7}
+h1{font-size:clamp(32px,6vw,50px);line-height:1.2;letter-spacing:-2px;margin:12px 0}
+h2{margin:0 0 15px;font-size:21px}
+.panel{border:1px solid #ffffff24;background:#16282aeb;border-radius:24px;padding:26px;box-shadow:0 24px 70px #0005;backdrop-filter:blur(10px)}
+.setup{max-width:670px;margin:45px auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:14px;font-weight:650;margin-bottom:8px}
+input,textarea{width:100%;background:#0d1c23;border:1px solid #ffffff25;border-radius:11px;color:white;padding:12px;outline:none}
+textarea{resize:vertical;min-height:75px}
+.person{display:flex;gap:7px;align-items:center}
+.person button{padding:11px}
+.divider{height:1px;background:#ffffff15;margin:24px 0}
+.wide{width:100%}
+.rule{font-size:13px;line-height:1.8;color:#b4c9c3}
+details{margin-top:20px}
+summary{cursor:pointer}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.badge{border:1px solid #ffffff26;border-radius:99px;padding:7px 13px;font-size:12px;color:#c4d9ce}
+.table{text-align:center;padding:27px 16px}
+.turn{font-size:27px;font-weight:850;margin:10px 0 6px;overflow-wrap:anywhere}
+.cards{display:flex;gap:24px;justify-content:center;align-items:center;margin:27px 0}
+.card{width:160px;height:224px;background:#fffdf5;border:1px solid #fff;border-radius:17px;box-shadow:0 16px 36px #0004;color:#1d2930;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:deal .3s ease-out}
+.card.red{color:#cf4e60}
+.corner{position:absolute;top:12px;left:15px;font-size:21px;font-weight:850;line-height:1.05}
+.corner.bottom{top:auto;left:auto;bottom:12px;right:15px;transform:rotate(180deg)}
+.suit{font-size:66px}
+.value{font-size:13px;opacity:.65;font-weight:700}
+.back{background:repeating-linear-gradient(45deg,#284d47 0px,#284d47 8px,#315950 8px,#315950 9px);border:6px solid #e6efdf;color:#d8f3df}
+.back .suit{font-size:43px}
+.back .value{letter-spacing:3px;font-size:10px}
+.cardlabel{font-size:11px;color:#a4bcb2;margin-top:13px;letter-spacing:1px}
+.vs{color:#78968b;font-size:24px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:13px;max-width:480px;margin:22px auto 0}
+.choices button{padding:18px;font-size:20px}
+.choices button:last-child{background:#e8ca92;color:#3d3019}
+.choices small{display:block;font-size:11px;letter-spacing:2px;margin-top:5px;opacity:.7}
+.status{max-width:540px;margin:20px auto 0;border-radius:16px;padding:18px;background:#ffffff08;line-height:1.6}
+.status strong{font-size:22px;display:block}
+.status.fail{background:#5b303950;border:1px solid #df7d8460}
+.status.win{background:#22573d60;border:1px solid #8bddac50}
+.players{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:18px}
+.player{border:1px solid #ffffff15;background:#14262b;border-radius:16px;padding:15px;overflow-wrap:anywhere}
+.player.active{border-color:var(--mint);background:#234538}
+.player strong{display:block;font-size:14px;margin-bottom:7px}
+.player span{font-size:12px;color:#afc5bc}
+.log{margin-top:22px}
+.entry{display:flex;justify-content:space-between;gap:14px;border-top:1px solid #ffffff10;padding:11px 0;font-size:13px;color:#b4c8c0;overflow-wrap:anywhere}
+.footer{text-align:center;font-size:11px;color:#719186;margin-top:28px;letter-spacing:2px}
+[hidden]{display:none!important}
+dialog{background:linear-gradient(145deg,#34203d,#153b3b);color:white;border:1px solid #ffffff45;border-radius:24px;max-width:440px;width:calc(100% - 36px);padding:27px;box-shadow:0 30px 100px #0008}
+dialog::backdrop{background:#071318d9;backdrop-filter:blur(7px)}
+.numbergrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:20px 0}
+.numbergrid button{padding:12px 0;background:#ffffff10;color:white}
+.numbergrid button.selected{background:var(--mint);color:#143529}
+.targetgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:20px 0}.targetgrid button{background:#ffffff12;color:white;border:1px solid #ffffff18}.targetgrid button.selected{background:#ffca65;color:#3b2100}.party-title{background:linear-gradient(90deg,#ffe46b,#ff7fa6,#71e9ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes deal{from{transform:translateY(10px) rotate(-3deg);opacity:.2}
+to{transform:none;opacity:1}
+}
+@media(max-width:520px){.wrap{padding:18px 14px}
+.setup{margin:26px auto}
+.panel{padding:20px}
+.card{width:124px;height:179px}
+.cards{gap:13px}
+.suit{font-size:52px}
+.vs{font-size:18px}
+.grid{grid-template-columns:1fr}
+.table{padding:22px 6px}
+.brand{font-size:16px}
+.turn{font-size:24px}
+.players{grid-template-columns:repeat(2,1fr)}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+}
+
+</style>
+</head><body><main class="wrap"><header><div class="brand">HIGH <span>/</span> LOW <span>♠</span></div><div><button id="sound" class="ghost small" aria-label="사운드 켜기 또는 끄기">🔊 사운드 ON</button> <button id="settings" class="ghost small" hidden>새 게임 설정</button></div></header>
+<section id="setup" class="panel setup"><div class="eyebrow">DRINK &amp; GUESS PARTY</div><h1 class="party-title">다음 카드,<br>높을까? 낮을까?</h1><p class="muted">카드를 예측하고, 조커로 판을 뒤집으세요.<br>친구들과 즐기는 컬러풀 하이로우 술자리!</p><div class="divider"></div><div class="topline"><h2>함께할 플레이어</h2><span class="badge" id="count"></span></div><div id="names" class="grid"></div><button id="add" class="ghost wide" style="margin-top:12px">＋ 플레이어 추가</button><div class="divider"></div><label for="penalty">벌칙 내용</label><textarea id="penalty" maxlength="150" placeholder="예: 원샷 또는 한 모금">원샷 또는 한 모금</textarea><details><summary class="muted">게임 규칙 확인</summary><p class="rule">• 일반 카드 52장 + 조커 2장, 총 54장입니다.<br>• A = 1, J = 11, Q = 12, K = 13입니다.<br>• 다음 카드가 조커이면 플레이어가 직접 숫자를 선택합니다.<br>• HIGH는 기준보다 큰 숫자, LOW는 작은 숫자만 선택할 수 있습니다.<br>• 같은 숫자가 나오면 현재 플레이어가 벌칙받을 사람을 지목합니다.<br>• 지목된 사람이 벌칙을 받은 뒤, 그 사람의 다음 플레이어부터 이어집니다.<br>• 첫 기준 카드가 조커라면 첫 플레이어가 1~13 중 기준 숫자를 정합니다.<br>• 54장을 모두 사용하면 다시 섞으며 기록과 차례는 유지됩니다.</p></details><button id="start" class="wide" style="margin-top:24px">카드 섞고 시작하기 →</button></section>
+<section id="game" hidden><div class="topline"><span class="badge" id="round"></span><span class="muted" id="remaining"></span></div><section class="table"><div class="eyebrow">YOUR TURN</div><div class="turn" id="turn"></div><div class="muted" id="hint">다음 카드의 숫자를 예측하세요.</div><div class="cards"><div><div id="current" class="card"></div><div class="cardlabel">기준 카드</div></div><div class="vs">→</div><div><div id="next" class="card back"></div><div class="cardlabel">다음 카드</div></div></div><div class="choices" id="choices"><button id="higher">↑ 더 크다<small>HIGHER</small></button><button id="lower">↓ 더 작다<small>LOWER</small></button></div><div id="result" class="status" aria-live="polite" hidden></div><button id="continue" style="margin-top:18px" hidden>다음 플레이어 →</button></section><div class="topline"><h2 style="margin:0;font-size:16px">플레이어 기록</h2><span class="muted" id="turncount"></span></div><div id="players" class="players"></div><details class="log"><summary class="muted">최근 플레이 기록</summary><div id="history"></div></details><p class="rule" style="text-align:center;margin-top:25px">조커: HIGH면 무조건 크게 · LOW면 무조건 작게<br>같은 숫자: 벌칙 상대 지목 후 그 다음 사람부터 시작</p></section><div class="footer">DRINK · LAUGH · HIGH OR LOW</div></main>
+<dialog id="joker"><div class="eyebrow">WILD CARD</div><h2 style="margin-top:12px">🃏 조커가 나왔어요!</h2><p id="jokertext" class="muted"></p><div class="numbergrid" id="numbers"></div><button id="confirmjoker" class="wide" disabled>숫자를 선택하세요</button></dialog>
+<dialog id="target"><div class="eyebrow">SAME NUMBER!</div><h2 style="margin-top:12px">🎯 벌칙 받을 사람 지목!</h2><p class="muted">같은 숫자가 나왔습니다. 벌칙을 받을 플레이어를 선택하세요.</p><div class="targetgrid" id="targets"></div><button id="confirmtarget" class="wide" disabled>플레이어를 선택하세요</button></dialog>
+<script type="text/plain" id="legacy-script">
+'use strict';
+const $=id=>document.getElementById(id);let players=[],deck=[],current=null,next=null,index=0,round=0,turns=0,phase='setup',guess=null,penalty='',chosen=null,jokerDone=null,history=[];
+function addName(value=''){const row=document.createElement('div');row.className='person';const input=document.createElement('input');input.maxLength=24;input.value=value;input.placeholder='플레이어 이름';input.setAttribute('aria-label','플레이어 이름');const b=document.createElement('button');b.className='ghost';b.textContent='×';b.setAttribute('aria-label','플레이어 삭제');b.onclick=()=>{row.remove();updateNames()}
+;row.append(input,b);$('names').append(row);updateNames()}
+
+function updateNames(){const rows=[...$('names').children];$('count').textContent=rows.length+'명';rows.forEach((r,i)=>{r.querySelector('button').disabled=rows.length<=1;r.querySelector('input').placeholder='플레이어 '+(i+1)}
+)}
+
+for(let i=1;i<=4;i++)addName('플레이어 '+i);$('add').onclick=()=>{addName();$('names').lastChild.querySelector('input').focus()}
+;
+function shuffledDeck(){const d=[];for(const suit of ['♠','♥','♦','♣'])for(let value=1;value<=13;value++)d.push({suit,value,joker:false}
+);d.push({suit:'🃏',value:null,joker:true}
+,{suit:'🃏',value:null,joker:true}
+);for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}
+return d}
+
+function face(card){return card.joker?'★':({1:'A',11:'J',12:'Q',13:'K'}
+[card.value]||card.value)}
+
+function drawCard(id,card){const el=$(id);el.replaceChildren();el.className='card'+(!card?' back':['♥','♦'].includes(card.suit)?' red':'');if(!card){el.innerHTML='<div class="suit">♠</div><div class="value">HIGH / LOW</div>';return}
+const a=document.createElement('div');a.className='corner';a.textContent=face(card)+' '+(card.joker?'':card.suit);const b=a.cloneNode(true);b.classList.add('bottom');const s=document.createElement('div');s.className='suit';s.textContent=card.suit;const v=document.createElement('div');v.className='value';v.textContent=card.value==null?'숫자 선택 중':card.joker?'지정 숫자 '+card.value:'숫자 '+card.value;el.append(a,s,v,b)}
+
+function render(){const p=players[index];$('turn').textContent=p.name+'님의 차례';$('round').textContent='DECK '+String(round).padStart(2,'0');$('remaining').textContent='남은 카드 '+deck.length+' / 54';$('turncount').textContent=turns+'회 플레이';drawCard('current',current);drawCard('next',next);$('higher').disabled=$('lower').disabled=phase!=='guess';$('choices').hidden=phase==='result';$('players').replaceChildren();players.forEach((p,i)=>{const el=document.createElement('div');el.className='player'+(i===index?' active':'');const title=document.createElement('strong');title.textContent=(i===index?'● ':'')+p.name;const stats=document.createElement('span');stats.textContent='성공 '+p.wins+' · 벌칙 '+p.losses+' · 무승부 '+p.ties;el.append(title,stats);$('players').append(el)}
+)}
+
+function askJoker(card,done){phase='joker';chosen=null;jokerDone=()=>{card.value=chosen;$('joker').close();done()}
+;$('jokertext').textContent=players[index].name+'님, 이 카드의 숫자를 선택하세요.'+(guess?' 선택한 숫자로 이번 '+(guess==='higher'?'“더 크다”':'“더 작다”')+' 예측을 판정합니다.':' 이 숫자가 첫 기준이 됩니다.');$('confirmjoker').disabled=true;$('confirmjoker').textContent='숫자를 선택하세요';$('numbers').replaceChildren();for(let i=1;i<=13;i++){const b=document.createElement('button');b.textContent=i;b.onclick=()=>{chosen=i;[...$('numbers').children].forEach(e=>e.classList.toggle('selected',e===b));$('confirmjoker').disabled=false;$('confirmjoker').textContent=i+'로 지정하기'}
+;$('numbers').append(b)}
+render();$('joker').showModal()}
+
+$('joker').addEventListener('cancel',e=>e.preventDefault());$('confirmjoker').onclick=()=>{if(chosen!==null&&jokerDone){const fn=jokerDone;jokerDone=null;fn()}
+}
+;
+function newDeck(){round++;deck=shuffledDeck();current=deck.pop();next=null;guess=null;$('result').hidden=true;$('continue').hidden=true;$('hint').textContent='다음 카드의 숫자를 예측하세요.';phase='guess';if(current.joker)askJoker(current,()=>{phase='guess';render()}
+);else render()}
+
+$('start').onclick=()=>{penalty=$('penalty').value.trim();if(!penalty){$('penalty').focus();$('penalty').setCustomValidity('시작 전에 벌칙을 입력해 주세요.');$('penalty').reportValidity();return}
+players=[...$('names').querySelectorAll('input')].map((el,i)=>({name:el.value.trim()||'플레이어 '+(i+1),wins:0,losses:0,ties:0}
+));index=0;round=0;turns=0;history=[];$('history').replaceChildren();$('setup').hidden=true;$('game').hidden=false;$('settings').hidden=false;newDeck();window.scrollTo(0,0)}
+;$('penalty').oninput=()=> $('penalty').setCustomValidity('');
+function predict(direction){if(phase!=='guess'||!deck.length)return;phase='reveal';guess=direction;next=deck.pop();if(next.joker)askJoker(next,resolve);else resolve()}
+
+function resolve(){const p=players[index],equal=next.value===current.value,win=!equal&&(guess==='higher'?next.value>current.value:next.value<current.value);if(equal)p.ties++;else if(win)p.wins++;else p.losses++;turns++;phase='result';render();const box=$('result');box.hidden=false;box.className='status '+(equal?'':win?'win':'fail');box.replaceChildren();const strong=document.createElement('strong');strong.textContent=equal?'같은 숫자! 무승부':win?'정답! 예측 성공 ✨':'아쉽지만, 벌칙 당첨!';const line=document.createElement('div');line.textContent=equal?'벌칙 없이 다음 차례로 넘어갑니다.':win?p.name+'님, 잘 맞혔어요.':p.name+'님 벌칙: '+penalty;box.append(strong,line);$('hint').textContent=current.value+' → '+next.value+' · '+(guess==='higher'?'더 크다':'더 작다')+' 선택';$('continue').hidden=false;$('continue').textContent=(win||equal?'':'벌칙 완료 · ')+(deck.length?'다음 플레이어 →':'모든 카드 사용! 다시 섞기 ↻');history.unshift({name:p.name,text:current.value+' → '+next.value+' · '+(equal?'무승부':win?'성공':'벌칙')}
+);$('history').replaceChildren();history.slice(0,20).forEach(h=>{const el=document.createElement('div');el.className='entry';const a=document.createElement('span'),b=document.createElement('span');a.textContent=h.name;b.textContent=h.text;el.append(a,b);$('history').append(el)}
+)}
+
+$('higher').onclick=()=>predict('higher');$('lower').onclick=()=>predict('lower');$('continue').onclick=()=>{if(phase!=='result')return;index=(index+1)%players.length;if(!deck.length){newDeck();return}
+current=next;next=null;guess=null;phase='guess';$('result').hidden=true;$('continue').hidden=true;$('hint').textContent='다음 카드의 숫자를 예측하세요.';render()}
+;$('settings').onclick=()=>{if(confirm('진행 중인 게임과 기록을 끝내고 새로 설정할까요?')){phase='setup';$('setup').hidden=false;$('game').hidden=true;$('settings').hidden=true}
+}
+;
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+let players=[],deck=[],current=null,next=null,index=0,round=0,turns=0,phase='setup',guess=null,penalty='',chosen=null,jokerDone=null,history=[],nextIndex=null,soundOn=true,audioCtx=null;
+function tone(freq=440,duration=.12,type='sine',volume=.12){if(!soundOn)return;audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(volume,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}
+function cheer(){tone(523,.12,'triangle');setTimeout(()=>tone(659,.12,'triangle'),110);setTimeout(()=>tone(784,.22,'triangle'),220)}
+function penaltySound(){tone(180,.18,'sawtooth',.15);setTimeout(()=>tone(120,.35,'square',.1),160);if(soundOn&&'speechSynthesis'in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance('앗싸, 걸렸네!');u.lang='ko-KR';u.rate=1.05;u.pitch=1.25;setTimeout(()=>speechSynthesis.speak(u),260)}}
+$('sound').onclick=()=>{soundOn=!soundOn;$('sound').textContent=soundOn?'🔊 사운드 ON':'🔇 사운드 OFF';if(soundOn)tone(660,.12,'triangle')};
+function addName(value=''){const row=document.createElement('div');row.className='person';const input=document.createElement('input');input.maxLength=24;input.value=value;input.placeholder='플레이어 이름';input.setAttribute('aria-label','플레이어 이름');const b=document.createElement('button');b.className='ghost';b.textContent='×';b.setAttribute('aria-label','플레이어 삭제');b.onclick=()=>{row.remove();updateNames()};row.append(input,b);$('names').append(row);updateNames()}
+function updateNames(){const rows=[...$('names').children];$('count').textContent=rows.length+'명';rows.forEach((r,i)=>{r.querySelector('button').disabled=rows.length<=1;r.querySelector('input').placeholder='플레이어 '+(i+1)})}
+for(let i=1;i<=4;i++)addName('플레이어 '+i);
+$('add').onclick=()=>{addName();$('names').lastChild.querySelector('input').focus()};
+function shuffledDeck(){const d=[];for(const suit of ['♠','♥','♦','♣'])for(let value=1;value<=13;value++)d.push({suit,value,joker:false});d.push({suit:'🃏',value:null,joker:true},{suit:'🃏',value:null,joker:true});for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}return d}
+function face(card){return card.joker?'★':({1:'A',11:'J',12:'Q',13:'K'}[card.value]||card.value)}
+function cardValue(card){if(card.joker&&card.wildLabel)return card.wildLabel;return card.value}
+function drawCard(id,card){const el=$(id);el.replaceChildren();el.className='card'+(!card?' back':['♥','♦'].includes(card.suit)?' red':'');if(!card){el.innerHTML='<div class="suit">♠</div><div class="value">HIGH / LOW</div>';return}const a=document.createElement('div');a.className='corner';a.textContent=face(card)+' '+(card.joker?'':card.suit);const b=a.cloneNode(true);b.classList.add('bottom');const s=document.createElement('div');s.className='suit';s.textContent=card.suit;const v=document.createElement('div');v.className='value';v.textContent=card.joker?(card.wildLabel||'기준 숫자 '+card.value):'숫자 '+card.value;el.append(a,s,v,b)}
+function render(){const p=players[index];$('turn').textContent=p.name+'님의 차례';$('round').textContent='DECK '+String(round).padStart(2,'0');$('remaining').textContent='남은 카드 '+deck.length+' / 54';$('turncount').textContent=turns+'회 플레이';drawCard('current',current);drawCard('next',next);$('higher').disabled=$('lower').disabled=phase!=='guess';$('choices').hidden=phase!=='guess';$('players').replaceChildren();players.forEach((p,i)=>{const el=document.createElement('div');el.className='player'+(i===index?' active':'');const title=document.createElement('strong');title.textContent=(i===index?'● ':'')+p.name;const stats=document.createElement('span');stats.textContent='성공 '+p.wins+' · 벌칙 '+p.losses+' · 같은 수 '+p.ties;el.append(title,stats);$('players').append(el)})}
+function askJoker(card,done,first=false){phase='joker';chosen=null;const min=first?1:(guess==='higher'?current.value+1:Math.max(0,current.value-13));const max=first?13:(guess==='lower'?current.value-1:Math.min(14,current.value+13));jokerDone=()=>{card.value=chosen;card.wildLabel=(first?'기준 숫자 ':guess==='higher'?'선택 HIGH ':'선택 LOW ')+chosen;$('joker').close();tone(880,.16,'triangle');done()};$('jokertext').textContent=first?players[index].name+'님, 첫 기준 숫자를 직접 선택하세요.':players[index].name+'님, '+(guess==='higher'?'기준보다 큰':'기준보다 작은')+' 조커 숫자를 선택하세요.';$('confirmjoker').disabled=true;$('confirmjoker').textContent='숫자를 선택하세요';$('numbers').replaceChildren();for(let i=0;i<=14;i++){if(first&&(i<1||i>13))continue;if(!first&&(i<min||i>max))continue;const b=document.createElement('button');b.textContent=i===0?'0 (A 아래)':i===14?'14 (K 위)':i;b.onclick=()=>{chosen=i;[...$('numbers').children].forEach(e=>e.classList.toggle('selected',e===b));$('confirmjoker').disabled=false;$('confirmjoker').textContent=b.textContent+' 선택하기'};$('numbers').append(b)}render();tone(700,.14,'sine');$('joker').showModal()}
+$('joker').addEventListener('cancel',e=>e.preventDefault());$('confirmjoker').onclick=()=>{if(chosen!==null&&jokerDone){const fn=jokerDone;jokerDone=null;fn()}};
+function newDeck(){round++;deck=shuffledDeck();current=deck.pop();next=null;guess=null;nextIndex=null;$('result').hidden=true;$('continue').hidden=true;$('hint').textContent='다음 카드의 숫자를 예측하세요.';phase='guess';if(current.joker)askJoker(current,()=>{phase='guess';render()},true);else render()}
+$('start').onclick=()=>{penalty=$('penalty').value.trim();if(!penalty){$('penalty').focus();$('penalty').setCustomValidity('시작 전에 벌칙을 입력해 주세요.');$('penalty').reportValidity();return}players=[...$('names').querySelectorAll('input')].map((el,i)=>({name:el.value.trim()||'플레이어 '+(i+1),wins:0,losses:0,ties:0}));index=0;round=0;turns=0;history=[];$('history').replaceChildren();$('setup').hidden=true;$('game').hidden=false;$('settings').hidden=false;newDeck();window.scrollTo(0,0)};
+$('penalty').oninput=()=>$('penalty').setCustomValidity('');
+function predict(direction){if(phase!=='guess'||!deck.length)return;phase='reveal';guess=direction;next=deck.pop();tone(330,.1,'square',.07);if(next.joker)askJoker(next,resolve,false);else resolve()}
+function showTargets(){chosen=null;$('targets').replaceChildren();players.forEach((p,i)=>{const b=document.createElement('button');b.textContent=p.name;b.onclick=()=>{chosen=i;[...$('targets').children].forEach(e=>e.classList.toggle('selected',e===b));$('confirmtarget').disabled=false;$('confirmtarget').textContent=p.name+'님 지목하기'};$('targets').append(b)});$('confirmtarget').disabled=true;$('confirmtarget').textContent='플레이어를 선택하세요';$('target').showModal()}
+$('target').addEventListener('cancel',e=>e.preventDefault());
+$('confirmtarget').onclick=()=>{if(chosen===null)return;const actor=players[index],target=players[chosen];target.losses++;nextIndex=(chosen+1)%players.length;$('target').close();phase='result';finishResult(true,false,actor,target);render()};
+function resolve(){const equal=next.value===current.value,win=!equal&&(guess==='higher'?next.value>current.value:next.value<current.value);turns++;if(equal){players[index].ties++;phase='target';render();showTargets();return}if(win)players[index].wins++;else players[index].losses++;nextIndex=(index+1)%players.length;phase='result';finishResult(false,win,players[index],players[index]);render()}
+function finishResult(equal,win,actor,target){const box=$('result');box.hidden=false;box.className='status '+(equal?'fail':win?'win':'fail');box.replaceChildren();const strong=document.createElement('strong');strong.textContent=equal?'같은 숫자! '+target.name+'님 지목 🎯':win?'정답! 예측 성공 ✨':'앗싸, 걸렸네! 🍻';const line=document.createElement('div');line.textContent=equal?target.name+'님 벌칙: '+penalty:win?actor.name+'님, 잘 맞혔어요.':actor.name+'님 벌칙: '+penalty;box.append(strong,line);$('hint').textContent=cardValue(current)+' → '+cardValue(next)+' · '+(guess==='higher'?'더 크다':'더 작다')+' 선택';$('continue').hidden=false;$('continue').textContent=(win?'':'벌칙 완료 · ')+(deck.length?'다음 플레이어 →':'모든 카드 사용! 다시 섞기 ↻');history.unshift({name:actor.name,text:cardValue(current)+' → '+cardValue(next)+' · '+(equal?target.name+' 지목':win?'성공':'벌칙')});$('history').replaceChildren();history.slice(0,20).forEach(h=>{const el=document.createElement('div');el.className='entry';const a=document.createElement('span'),b=document.createElement('span');a.textContent=h.name;b.textContent=h.text;el.append(a,b);$('history').append(el)});if(win)cheer();else penaltySound()}
+$('higher').onclick=()=>predict('higher');$('lower').onclick=()=>predict('lower');
+$('continue').onclick=()=>{if(phase!=='result')return;index=nextIndex??((index+1)%players.length);if(!deck.length){newDeck();return}current=next;next=null;guess=null;nextIndex=null;phase='guess';$('result').hidden=true;$('continue').hidden=true;$('hint').textContent='다음 카드의 숫자를 예측하세요.';render()};
+$('settings').onclick=()=>{if(confirm('진행 중인 게임과 기록을 끝내고 새로 설정할까요?')){phase='setup';$('setup').hidden=false;$('game').hidden=true;$('settings').hidden=true}};
+</script>
+</body></html>
