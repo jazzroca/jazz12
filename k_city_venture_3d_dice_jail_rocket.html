@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#10243d">
+<title>K-City Venture 2nd Half Edition</title>
+<style>
+:root{
+  --bg:#09131f;--panel:#13263e;--panel2:#0e1d31;--text:#f7fbff;--muted:#9fb3c9;
+  --accent:#71f2c0;--danger:#ff667a;--gold:#ffd965;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif}
+body{min-height:100svh;overflow:auto}
+button{font:inherit}
+.app{
+  min-height:100svh;
+  padding:max(8px,env(safe-area-inset-top)) max(7px,env(safe-area-inset-right))
+          max(12px,env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left));
+  background:radial-gradient(circle at 50% 0,#17375b 0,transparent 35%),linear-gradient(#09131f,#07101b);
+}
+.header{max-width:820px;margin:0 auto 7px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-size:clamp(18px,5vw,28px);font-weight:1000;letter-spacing:-.04em}
+.brand small{font-size:10px;color:var(--accent);display:block;letter-spacing:.12em}
+.top-actions{display:flex;gap:5px}
+.iconbtn{
+  min-width:39px;height:36px;border:1px solid #ffffff22;border-radius:10px;background:#ffffff12;color:#fff;font-weight:900
+}
+.board-wrap{max-width:820px;margin:auto}
+.board{
+  width:100%;aspect-ratio:1/1;display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);
+  gap:2px;padding:2px;background:#050b14;border:2px solid #294764;border-radius:16px;
+  box-shadow:0 12px 34px #0008,inset 0 0 30px #0008;position:relative;overflow:hidden;
+  transform-origin:center center;
+}
+.board.camera-focus{
+  animation:boardPulse .56s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes boardPulse{
+  0%{transform:scale(1)}
+  38%{transform:scale(1.035)}
+  100%{transform:scale(1)}
+}
+.space{
+  position:relative;min-width:0;min-height:0;border-radius:5px;padding:2px;
+  background:linear-gradient(145deg,#17304d,#10243a);border:1px solid rgba(255,255,255,.08);
+  overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;
+  transition:transform .22s ease, box-shadow .22s ease, filter .22s ease, background .22s ease;
+}
+.space.owned{
+  background:
+    linear-gradient(145deg,color-mix(in srgb,var(--owner-color) 34%,#152b44),color-mix(in srgb,var(--owner-color) 18%,#0c1d31));
+  border:2px solid var(--owner-color);
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--owner-color) 28%,transparent);
+}
+.space.focus-space{
+  z-index:20;
+  transform:scale(1.32);
+  filter:brightness(1.22) saturate(1.18);
+  box-shadow:0 0 0 3px #fff,0 8px 22px #000c,0 0 22px var(--focus-color,#8ae5ff);
+}
+.space.focus-space .space-name{font-size:clamp(9px,2.7vw,16px)}
+.space.focus-space .space-sub{font-size:clamp(7px,1.9vw,11px)}
+.owner-tag{
+  position:absolute;right:1px;top:1px;z-index:3;
+  min-width:13px;height:13px;border-radius:999px;padding:0 3px;
+  display:grid;place-items:center;font-size:clamp(6px,1.5vw,9px);font-weight:1000;
+  color:#06111c;background:var(--owner-color,#fff);box-shadow:0 1px 4px #0008
+}
+.space.city{border-top:5px solid var(--group,#48c9b0)}
+.space.special{background:linear-gradient(145deg,#253451,#14253d)}
+.space.ai{background:linear-gradient(145deg,#492a67,#22224b)}
+.space.start{background:linear-gradient(145deg,#0b6e55,#124239)}
+.space-name{
+  font-weight:950;font-size:clamp(7px,2.25vw,14px);line-height:1.02;letter-spacing:-.05em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.space-sub{font-size:clamp(5.5px,1.55vw,10px);color:#c7d5e7;line-height:1}
+.ownerbar{height:4px;border-radius:4px;background:transparent;margin-top:1px}
+.tokens{
+  position:absolute;left:2px;right:2px;bottom:2px;display:flex;gap:0;justify-content:center;align-items:flex-end;z-index:4
+}
+.token{
+  font-size:clamp(10px,3vw,22px);line-height:1;filter:drop-shadow(0 2px 1px #000);
+  transition:transform .18s ease
+}
+.dev{font-size:clamp(7px,1.8vw,12px);line-height:1;height:12px;white-space:nowrap}
+.center{
+  grid-column:2/9;grid-row:2/9;border-radius:12px;
+  background:radial-gradient(circle at 50% 12%,#1f466b,#0c1b2e 55%,#081321);
+  border:1px solid #ffffff13;padding:8px;display:flex;flex-direction:column;gap:7px;overflow:hidden
+}
+.turnbox{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.player-id{display:flex;align-items:center;gap:8px;min-width:0}
+.bigcar{font-size:clamp(26px,8vw,52px);filter:drop-shadow(0 4px 2px #0007)}
+.pname{font-size:clamp(15px,4.4vw,25px);font-weight:1000;white-space:nowrap}
+.cash{font-size:clamp(15px,4.3vw,25px);font-weight:1000;color:var(--gold);text-align:right}
+.meta{font-size:clamp(9px,2.4vw,13px);color:var(--muted)}
+.dicebox{display:flex;align-items:center;justify-content:center;gap:10px;flex:1;min-height:70px}
+.dicebox{
+  perspective:700px;
+  position:relative;
+}
+.die{
+  width:clamp(58px,17vw,96px);aspect-ratio:1;border-radius:17px;background:linear-gradient(145deg,#fff,#e7edf5);
+  color:#10151b;display:grid;place-items:center;font-size:clamp(34px,10vw,60px);font-weight:1000;
+  border:1px solid #ffffff;
+  box-shadow:
+    inset 7px 7px 12px #ffffff,
+    inset -8px -10px 14px #b9c3cf,
+    0 12px 0 #9da8b5,
+    0 18px 22px #0009;
+  transform-style:preserve-3d;
+}
+.die::after{
+  content:"";position:absolute;inset:8%;border-radius:12px;
+  border:1px solid rgba(255,255,255,.85);pointer-events:none
+}
+.die.rolling.leftdie{animation:diceThrowL .62s cubic-bezier(.15,.75,.25,1) infinite}
+.die.rolling.rightdie{animation:diceThrowR .62s cubic-bezier(.15,.75,.25,1) infinite}
+.die.landed{animation:diceLand .35s cubic-bezier(.2,.85,.3,1)}
+@keyframes diceThrowL{
+  0%{transform:translate3d(-12px,20px,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(.8)}
+  45%{transform:translate3d(8px,-48px,70px) rotateX(390deg) rotateY(260deg) rotateZ(80deg) scale(1.18)}
+  100%{transform:translate3d(0,0,0) rotateX(720deg) rotateY(520deg) rotateZ(180deg) scale(1)}
+}
+@keyframes diceThrowR{
+  0%{transform:translate3d(12px,20px,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(.8)}
+  45%{transform:translate3d(-8px,-52px,76px) rotateX(330deg) rotateY(410deg) rotateZ(-100deg) scale(1.18)}
+  100%{transform:translate3d(0,0,0) rotateX(680deg) rotateY(720deg) rotateZ(-180deg) scale(1)}
+}
+@keyframes diceLand{
+  0%{transform:translateY(-18px) scale(1.08)}
+  58%{transform:translateY(4px) scale(.96)}
+  100%{transform:translateY(0) scale(1)}
+}
+.main-actions{display:grid;grid-template-columns:1.4fr 1fr;gap:7px}
+.action{
+  min-height:48px;border:0;border-radius:14px;font-weight:1000;font-size:clamp(13px,3.6vw,18px);
+  box-shadow:0 5px 13px #0005
+}
+.roll{background:linear-gradient(#84ffd1,#4dd8aa);color:#05291f}
+.secondary{background:#d8e6f7;color:#10243d}
+.action:disabled{opacity:.42;filter:grayscale(.5)}
+.log{
+  min-height:58px;max-height:92px;overflow:auto;border-radius:10px;background:#0004;padding:7px;
+  font-size:clamp(9px,2.35vw,12px);line-height:1.35;color:#d5e2f1
+}
+.players-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
+.pmini{
+  min-width:0;border:1px solid #ffffff14;border-radius:8px;padding:4px 6px;background:#ffffff08;
+  font-size:clamp(8px,2.2vw,12px);display:flex;justify-content:space-between;gap:4px
+}
+.pmini.current{outline:2px solid var(--accent)}
+.pmini.out{opacity:.35;text-decoration:line-through}
+.legend{font-size:clamp(7px,1.9vw,10px);color:#90a9c1;text-align:center}
+.modal{
+  position:fixed;inset:0;background:#000b;display:none;place-items:center;padding:18px;z-index:50
+}
+.modal.show{display:grid}
+.card{
+  width:min(92vw,430px);max-height:88svh;overflow:auto;background:linear-gradient(160deg,#1a3250,#0e1d31);
+  border:1px solid #ffffff28;border-radius:22px;padding:20px;box-shadow:0 22px 70px #000b
+}
+.card h2{margin:0 0 7px;font-size:clamp(22px,6vw,32px)}
+.card p{margin:6px 0 14px;line-height:1.45;color:#d9e6f5}
+.card .money{color:var(--gold);font-weight:1000;font-size:22px}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.choice button{
+  min-height:48px;border:0;border-radius:13px;font-weight:950;font-size:15px
+}
+.yes{background:var(--accent);color:#062d23}.no{background:#d6e0ea;color:#183047}
+.sell-list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.sellbtn{
+  display:flex;justify-content:space-between;gap:8px;width:100%;padding:10px;border-radius:11px;
+  border:1px solid #ffffff1f;background:#ffffff0d;color:#fff
+}
+.setup-players{display:flex;justify-content:center;gap:8px;margin:14px 0}
+.num{
+  width:58px;height:52px;border:1px solid #ffffff25;border-radius:14px;background:#ffffff10;color:white;font-weight:1000;font-size:20px
+}
+.num.active{background:var(--accent);color:#073226}
+.story{
+  font-size:13px;line-height:1.5;background:#0003;border-radius:12px;padding:10px;color:#ccdae9;margin:10px 0
+}
+@media(max-width:560px){
+  .app{padding-left:4px;padding-right:4px}
+  .header{margin-bottom:4px}
+  .board{border-radius:12px;gap:1px;padding:1px}
+  .center{padding:5px;gap:5px;border-radius:9px}
+  .space{padding:1px;border-radius:3px}
+  .space.city{border-top-width:4px}
+  .space-name{font-size:clamp(6.5px,2.18vw,11px)}
+  .space-sub{font-size:clamp(5px,1.42vw,8px)}
+  .dev{font-size:clamp(6px,1.65vw,9px);height:10px}
+  .tokens{bottom:1px}
+  .action{min-height:46px;border-radius:12px}
+  .main-actions{gap:5px}
+  .players-mini{gap:3px}
+  .pmini{padding:3px 4px}
+  .log{min-height:46px;max-height:68px;padding:5px}
+  .dicebox{min-height:82px;gap:13px}
+}
+@media(max-width:390px){
+  .center{padding:4px;gap:4px}
+  .dicebox{min-height:74px}
+  .action{min-height:42px;font-size:12px}
+  .log{min-height:42px;max-height:56px}
+  .legend{font-size:6.5px}
+  .cash{font-size:clamp(13px,4vw,20px)}
+  .pname{font-size:clamp(13px,4vw,20px)}
+}
+
+.dicebox{perspective:900px;min-height:112px}
+.dice3d{
+  --die-size:clamp(68px,19vw,108px);
+  width:var(--die-size);height:var(--die-size);
+  position:relative;transform-style:preserve-3d;filter:drop-shadow(0 17px 10px #0009)
+}
+.cube{
+  position:absolute;inset:0;transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.18,.85,.22,1)
+}
+.dice3d.throwing .cube{animation:realThrow .82s cubic-bezier(.13,.7,.2,1)}
+@keyframes realThrow{
+  0%{transform:translate3d(0,22px,0) rotateX(0) rotateY(0) rotateZ(0) scale(.78)}
+  38%{transform:translate3d(var(--tx,10px),-58px,80px) rotateX(430deg) rotateY(320deg) rotateZ(120deg) scale(1.14)}
+  72%{transform:translate3d(calc(var(--tx,10px)*-.35),8px,20px) rotateX(690deg) rotateY(590deg) rotateZ(250deg) scale(.96)}
+  100%{transform:translate3d(0,0,0) rotateX(720deg) rotateY(720deg) rotateZ(360deg) scale(1)}
+}
+.dice3d:nth-child(1){--tx:-18px}.dice3d:nth-child(2){--tx:18px}
+.face{
+  position:absolute;inset:0;border-radius:18px;
+  background:linear-gradient(145deg,#fff 0%,#f6f7f8 45%,#d8dde4 100%);
+  border:1px solid #fff;
+  box-shadow:inset 7px 7px 12px #fff,inset -7px -8px 13px #b8c0c9;
+  display:grid;place-items:center;padding:16%;backface-visibility:hidden
+}
+.face i{display:block;width:clamp(9px,2.7vw,15px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#555,#07090b 58%,#000);box-shadow:inset 0 1px 2px #ffffff55,0 1px 1px #fff}
+.f1{transform:translateZ(calc(var(--die-size) * .5))}
+.f2{transform:rotateY(180deg) translateZ(calc(var(--die-size) * .5));grid-template-columns:1fr 1fr;align-content:space-between}
+.f2 i:first-child{justify-self:start;align-self:start}.f2 i:last-child{justify-self:end;align-self:end}
+.f3{transform:rotateY(90deg) translateZ(calc(var(--die-size) * .5));grid-template-columns:1fr 1fr 1fr}
+.f3 i:nth-child(1){justify-self:start;align-self:start}.f3 i:nth-child(2){justify-self:center;align-self:center}.f3 i:nth-child(3){justify-self:end;align-self:end}
+.f4{transform:rotateY(-90deg) translateZ(calc(var(--die-size) * .5));grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.f4 i:nth-child(odd){justify-self:start}.f4 i:nth-child(even){justify-self:end}.f4 i:nth-child(-n+2){align-self:start}.f4 i:nth-child(n+3){align-self:end}
+.f5{transform:rotateX(90deg) translateZ(calc(var(--die-size) * .5));grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr}
+.f5 i:nth-child(1){grid-area:1/1}.f5 i:nth-child(2){grid-area:1/3}.f5 i:nth-child(3){grid-area:2/2}.f5 i:nth-child(4){grid-area:3/1}.f5 i:nth-child(5){grid-area:3/3}
+.f6{transform:rotateX(-90deg) translateZ(calc(var(--die-size) * .5));grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr}
+.f6 i:nth-child(odd){justify-self:start}.f6 i:nth-child(even){justify-self:end}
+.f6 i:nth-child(-n+2){align-self:start}.f6 i:nth-child(n+3):nth-child(-n+4){align-self:center}.f6 i:nth-child(n+5){align-self:end}
+.space.jail{background:linear-gradient(145deg,#5a3d28,#2c211d);border:2px solid #ffb65b}
+.space.rocket{background:linear-gradient(145deg,#244c67,#171f48);border:2px solid #69e9ff}
+.phase-banner{
+  font-weight:1000;color:#ffd965;font-size:clamp(9px,2.3vw,12px)
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand">K-City Venture<small>3D DICE · 2-PHASE ECONOMY</small></div>
+    <div class="top-actions">
+      <button class="iconbtn" id="settleBtn" title="자산 정산">＄</button>
+      <button class="iconbtn" id="restartBtn" title="새 게임">↻</button>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <div class="center">
+        <div class="turnbox">
+          <div class="player-id">
+            <div class="bigcar" id="bigCar">🚙</div>
+            <div>
+              <div class="pname" id="pname">PLAYER 1</div>
+              <div class="meta" id="pmeta">도시 0 · 개발 0</div>
+            </div>
+          </div>
+          <div>
+            <div class="cash" id="cash">$15,000</div>
+            <div class="meta" style="text-align:right" id="turnNo">TURN 1</div>
+            <div class="meta" style="text-align:right;color:#ffd965" id="phaseInfo">전반전 · 토지 매입</div>
+          </div>
+        </div>
+
+        <div class="dicebox">
+          <div class="dice3d" id="die1" aria-label="첫 번째 주사위">
+            <div class="cube">
+              <div class="face f1"><i></i></div>
+              <div class="face f2"><i></i><i></i></div>
+              <div class="face f3"><i></i><i></i><i></i></div>
+              <div class="face f4"><i></i><i></i><i></i><i></i></div>
+              <div class="face f5"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="face f6"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+          <div class="dice3d" id="die2" aria-label="두 번째 주사위">
+            <div class="cube">
+              <div class="face f1"><i></i></div>
+              <div class="face f2"><i></i><i></i></div>
+              <div class="face f3"><i></i><i></i><i></i></div>
+              <div class="face f4"><i></i><i></i><i></i><i></i></div>
+              <div class="face f5"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="face f6"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="main-actions">
+          <button class="action roll" id="rollBtn">🎲 주사위 굴리기</button>
+          <button class="action secondary" id="manageBtn">💼 자산 관리</button>
+        </div>
+
+        <div class="players-mini" id="playersMini"></div>
+        <div class="log" id="log">게임을 시작하세요.</div>
+        <div class="legend">전반전: 도시 매입 · 70% 매각 후 후반전: 🛒 마트 → ☕ 카페 → ⛽ 주유·EV → 🏬 복합상권</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal show" id="setupModal">
+  <div class="card">
+    <h2>🚗 K-City Venture</h2>
+    <div class="story">
+      2026년, 여러분은 스마트 모빌리티를 타고 한반도의 도시를 여행하는 지역 투자자입니다.
+      도시를 사들이는 데서 끝나지 않고 마트·카페거리·주유/EV 충전소·스마트 복합상권으로 키우세요.
+      AI 시대의 뜻밖의 기회와 사고를 이겨내 가장 가치 있는 지역 네트워크를 만드는 사람이 승리합니다.
+      더블이면 한 번 더 플레이하고, 격리섬에서는 최대 3번 탈출을 시도합니다. 전체 도시의 70%가 팔리면 후반전이 시작됩니다.
+    </div>
+    <p>플레이 인원을 선택하세요. 한 기기에서 번갈아 플레이합니다.</p>
+    <div class="setup-players">
+      <button class="num active" data-n="2">2</button>
+      <button class="num" data-n="3">3</button>
+      <button class="num" data-n="4">4</button>
+    </div>
+    <button class="action roll" id="startBtn" style="width:100%">게임 시작</button>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="card">
+    <h2 id="modalTitle">알림</h2>
+    <p id="modalBody"></p>
+    <div id="modalExtra"></div>
+    <div class="choice" id="modalChoices"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const GROUP_COLORS={
+  capital:"#55c7ff", gangwon:"#5de28d", chungcheong:"#ffd166", honam:"#ff8aa8",
+  yeongnam:"#ff9c55", jeju:"#b984ff", northWest:"#8aa9ff", northEast:"#77e4df"
+};
+const DEV_NAMES=["미개발","지역 마트","로컬 카페거리","주유·EV 충전소","스마트 복합상권"];
+const DEV_ICONS=["","🛒","☕","⛽","🏬"];
+const CARS=[
+  {name:"전기 SUV",icon:"🚙",color:"#42e58d"},
+  {name:"전기 세단",icon:"🚗",color:"#46a8ff"},
+  {name:"미래형 픽업",icon:"🛻",color:"#ffd84a"},
+  {name:"스포츠 쿠페",icon:"🏎️",color:"#ff5f8f"}
+];
+
+const spaces=[
+  {type:"start",name:"START",sub:"한 바퀴 +$2,000"},
+  {type:"city",name:"서울",group:"capital",price:3800},
+  {type:"ai",name:"AI 찬스",sub:"🤖✨"},
+  {type:"city",name:"인천",group:"capital",price:2900},
+  {type:"city",name:"수원",group:"capital",price:2500},
+  {type:"rest",name:"스마트 휴게소",sub:"+$300"},
+  {type:"city",name:"춘천",group:"gangwon",price:1700},
+  {type:"jail",name:"격리섬",sub:"🏝️ 최대 3턴"},
+  {type:"city",name:"강릉",group:"gangwon",price:1900},
+
+  {type:"city",name:"대전",group:"chungcheong",price:2200},
+  {type:"city",name:"세종",group:"chungcheong",price:2400},
+  {type:"fund",name:"지역기금",sub:"-$450"},
+  {type:"city",name:"전주",group:"honam",price:1800},
+  {type:"city",name:"광주",group:"honam",price:2200},
+  {type:"ai",name:"AI 찬스",sub:"🤖✨"},
+  {type:"city",name:"목포",group:"honam",price:1600},
+  {type:"rocket",name:"나로-X 우주항",sub:"🚀 원하는 곳 이동"},
+
+  {type:"city",name:"여수",group:"honam",price:2100},
+  {type:"city",name:"대구",group:"yeongnam",price:2500},
+  {type:"city",name:"경주",group:"yeongnam",price:1900},
+  {type:"city",name:"포항",group:"yeongnam",price:2100},
+  {type:"city",name:"부산",group:"yeongnam",price:3300},
+  {type:"ai",name:"AI 찬스",sub:"🤖✨"},
+  {type:"city",name:"울산",group:"yeongnam",price:2600},
+  {type:"city",name:"제주",group:"jeju",price:3000},
+
+  {type:"city",name:"평양",group:"northWest",price:2700},
+  {type:"city",name:"개성",group:"northWest",price:1900},
+  {type:"ai",name:"AI 찬스",sub:"🤖✨"},
+  {type:"city",name:"신의주",group:"northWest",price:1700},
+  {type:"city",name:"원산",group:"northEast",price:1800},
+  {type:"city",name:"함흥",group:"northEast",price:1900},
+  {type:"city",name:"청진",group:"northEast",price:1700}
+];
+
+const aiCards=[
+  {t:"AI 번역 안내판이 관광객에게 인기!",money:700},
+  {t:"자율주행 셔틀 시범운행 성공! 앞으로 3칸 이동.",move:3},
+  {t:"데이터센터 전기료가 급등했습니다.",money:-500},
+  {t:"지역축제가 추천 알고리즘을 탔습니다! 보유 도시마다 $180 획득.",perCity:180},
+  {t:"AI 보이스피싱 예방 캠페인 성공!",money:400},
+  {t:"배달로봇이 길을 잃었습니다. 수리비가 들었습니다.",money:-250},
+  {t:"스마트팜 납품 계약 체결!",money:600},
+  {t:"AI 기상예측으로 폭우 피해를 미리 막았습니다.",money:350},
+  {t:"클라우드 장애 발생. 다음 차례를 한 번 쉽니다.",skip:1},
+  {t:"친환경 충전 인프라 보조금! 가장 개발이 낮은 내 도시를 무료 업그레이드.",freeUpgrade:true},
+  {t:"동네 맛집이 숏폼 추천에 떴습니다!",money:450},
+  {t:"AI 재고예측 성공! 폐기 비용을 절감했습니다.",money:300},
+  {t:"로봇 배송 시범사업이 예상보다 비쌌습니다.",money:-350},
+  {t:"스마트 관광패스가 히트! 보유 도시마다 $120.",perCity:120},
+  {t:"지역 데이터 해커톤 우승!",money:550},
+  {t:"충전소 앱 리뷰가 좋아졌습니다.",money:280},
+  {t:"AI 상담봇 오류로 환불 소동.",money:-300},
+  {t:"무인 마트 야간 매출이 급증했습니다.",money:420},
+  {t:"지역 대학과 AI 인재 협약 체결.",money:500},
+  {t:"스마트 교통 최적화 덕분에 이동이 빨라집니다. 앞으로 2칸.",move:2},
+  {t:"AI가 광고비를 너무 써버렸습니다.",money:-420},
+  {t:"디지털 관광지도 업데이트 지원금!",money:380}
+];
+
+let playerCount=2, players=[], current=0, turn=1, busy=false, dice=[1,1], gameOver=false;
+let logLines=[], secondHalf=false, extraTurn=false;
+
+const board=document.getElementById("board");
+const rollBtn=document.getElementById("rollBtn");
+const manageBtn=document.getElementById("manageBtn");
+const modal=document.getElementById("modal");
+const modalTitle=document.getElementById("modalTitle");
+const modalBody=document.getElementById("modalBody");
+const modalExtra=document.getElementById("modalExtra");
+const modalChoices=document.getElementById("modalChoices");
+const die1=document.getElementById("die1"),die2=document.getElementById("die2");
+
+function money(n){return "$"+Math.round(n).toLocaleString("en-US")}
+const DIE_ROT={
+  1:[0,0,0], 2:[0,180,0], 3:[0,-90,0], 4:[0,90,0], 5:[-90,0,0], 6:[90,0,0]
+};
+function setDieValue(el,n){
+  const [x,y,z]=DIE_ROT[n];
+  const cube=el.querySelector(".cube");
+  cube.style.transform=`rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+  el.setAttribute("aria-label",`주사위 ${n}`);
+}
+function soldRatio(){
+  const cities=spaces.filter(s=>s.type==="city");
+  const sold=cities.filter(s=>s.owner!=null).length;
+  return cities.length?sold/cities.length:0;
+}
+function checkSecondHalf(){
+  if(!secondHalf && soldRatio()>=0.70){
+    secondHalf=true;
+    addLog("🔥 전체 도시의 70%가 팔렸습니다. 후반전 시작! 개발·통행세·건물세 활성화.");
+    showModal("🔥 후반전 시작!",`전체 도시의 <b>${Math.round(soldRatio()*100)}%</b>가 매각되었습니다.<br><br>이제부터 자기 땅에서는 사업시설을 개발할 수 있고, 다른 플레이어가 방문하면 <b>통행세 + 건물세</b>를 받습니다.`,
+      [{label:"후반전 시작",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+    return true;
+  }
+  return false;
+}
+function cityCount(p){return spaces.filter(s=>s.type==="city"&&s.owner===p.id).length}
+function devCount(p){return spaces.filter(s=>s.type==="city"&&s.owner===p.id).reduce((a,s)=>a+(s.dev||0),0)}
+function totalAssets(p){
+  let v=p.cash;
+  for(const s of spaces) if(s.type==="city"&&s.owner===p.id){
+    v+=s.price;
+    v+=Math.round((s.dev||0)*upgradeCost(s)*0.65);
+  }
+  return v;
+}
+function upgradeCost(s){return Math.round(s.price*0.42)}
+function ownsFullGroup(p,group){
+  const g=spaces.filter(s=>s.type==="city"&&s.group===group);
+  return g.length>0&&g.every(s=>s.owner===p.id)
+}
+function feeBreakdown(s){
+  if(!secondHalf)return {land:0,building:0,total:0};
+  const land=Math.round(s.price*0.18);
+  const buildRates=[0,.18,.42,.78,1.28];
+  const building=Math.round(s.price*buildRates[s.dev||0]);
+  let total=land+building;
+  const owner=players.find(p=>p.id===s.owner);
+  if(owner&&ownsFullGroup(owner,s.group))total=Math.round(total*1.3);
+  return {land,building,total};
+}
+function toll(s){return feeBreakdown(s).total}
+function resale(s){return Math.round((s.price+(s.dev||0)*upgradeCost(s)*.65)*.6)}
+
+function addLog(t){
+  logLines.unshift(t);logLines=logLines.slice(0,8);
+  document.getElementById("log").innerHTML=logLines.map(x=>"• "+x).join("<br>");
+}
+function activePlayers(){return players.filter(p=>!p.out)}
+function currentPlayer(){return players[current]}
+
+function makeBoard(){
+  [...board.querySelectorAll(".space")].forEach(x=>x.remove());
+  const coords=[];
+  for(let c=1;c<=9;c++)coords.push([1,c]);
+  for(let r=2;r<=8;r++)coords.push([r,9]);
+  for(let c=9;c>=1;c--)coords.push([9,c]);
+  for(let r=8;r>=2;r--)coords.push([r,1]);
+
+  spaces.forEach((s,i)=>{
+    s.dev=s.dev||0;s.owner=s.owner??null;
+    const el=document.createElement("div");
+    el.className="space "+s.type+(s.type==="city"?" city":" special")+(s.type==="ai"?" ai":"")+(s.type==="start"?" start":"")+(s.type==="jail"?" jail":"")+(s.type==="rocket"?" rocket":"");
+    el.style.gridRow=coords[i][0];el.style.gridColumn=coords[i][1];
+    if(s.group)el.style.setProperty("--group",GROUP_COLORS[s.group]);
+    const owner=s.owner!=null?players.find(p=>p.id===s.owner):null;
+    if(owner){
+      el.classList.add("owned");
+      el.style.setProperty("--owner-color",owner.color);
+    }
+    el.dataset.i=i;
+    el.innerHTML=spaceHTML(s,i);
+    board.appendChild(el);
+  });
+  renderTokens();
+}
+
+function spaceHTML(s,i){
+  let sub=s.sub||"";
+  if(s.type==="city")sub=money(s.price);
+  let dev="";
+  if(s.type==="city"&&s.dev)dev=DEV_ICONS.slice(1,s.dev+1).join("");
+  const owner=s.owner!=null?players.find(p=>p.id===s.owner):null;
+  return `${owner?`<div class="owner-tag" style="--owner-color:${owner.color}">P${owner.id+1}</div>`:""}
+          <div><div class="space-name">${s.name}</div><div class="space-sub">${sub}</div></div>
+          <div class="dev">${dev}</div>
+          <div class="ownerbar" style="background:${owner?owner.color:"transparent"}"></div>
+          <div class="tokens"></div>`;
+}
+
+function renderBoardData(){
+  spaces.forEach((s,i)=>{
+    const el=board.querySelector(`.space[data-i="${i}"]`);
+    if(el){
+      el.innerHTML=spaceHTML(s,i);
+      const owner=s.owner!=null?players.find(p=>p.id===s.owner):null;
+      el.classList.toggle("owned",!!owner);
+      if(owner)el.style.setProperty("--owner-color",owner.color);
+      else el.style.removeProperty("--owner-color");
+    }
+  });
+  renderTokens();
+}
+
+function renderTokens(){
+  board.querySelectorAll(".tokens").forEach(x=>x.innerHTML="");
+  for(const p of players){
+    if(p.out)continue;
+    const host=board.querySelector(`.space[data-i="${p.pos}"] .tokens`);
+    if(host){
+      const t=document.createElement("span");t.className="token";t.textContent=p.car;
+      t.style.filter=`drop-shadow(0 0 4px ${p.color}) drop-shadow(0 2px 1px #000)`;
+      host.appendChild(t);
+    }
+  }
+}
+
+function updateHUD(){
+  if(!players.length)return;
+  const p=currentPlayer();
+  document.getElementById("bigCar").textContent=p.car;
+  document.getElementById("pname").textContent=p.name+" · "+p.carName;
+  document.getElementById("cash").textContent=money(p.cash);
+  document.getElementById("pmeta").textContent=`도시 ${cityCount(p)} · 개발 ${devCount(p)} · 총자산 ${money(totalAssets(p))}`;
+  document.getElementById("turnNo").textContent="TURN "+turn+(p.skip?` · 휴식 ${p.skip}`:"")+(p.inJail?` · 격리 ${p.jailTurns}/3`:"");
+  document.getElementById("phaseInfo").textContent=secondHalf
+    ? "후반전 · 개발/통행세/건물세"
+    : `전반전 · 토지 매입 ${Math.round(soldRatio()*100)}% / 70%`;
+  document.getElementById("playersMini").innerHTML=players.map((x,idx)=>
+    `<div class="pmini ${idx===current?"current":""} ${x.out?"out":""}">
+      <span>${x.car} P${x.id+1}</span><b>${money(x.cash)}</b>
+    </div>`).join("");
+  rollBtn.disabled=busy||gameOver;
+  manageBtn.disabled=busy||gameOver;
+}
+
+function resetData(){
+  spaces.forEach(s=>{if(s.type==="city"){s.owner=null;s.dev=0}});
+  players=Array.from({length:playerCount},(_,i)=>({
+    id:i,name:"PLAYER "+(i+1),cash:15000,pos:0,out:false,skip:0,jailTurns:0,inJail:false,
+    car:CARS[i].icon,carName:CARS[i].name,color:CARS[i].color
+  }));
+  current=0;turn=1;busy=false;gameOver=false;logLines=[];secondHalf=false;extraTurn=false;
+  dice=[1,1];setDieValue(die1,1);setDieValue(die2,1);
+  makeBoard();updateHUD();addLog("모든 플레이어가 START에서 출발합니다.");
+}
+
+function showModal(title,body,buttons=[{label:"확인",class:"yes",fn:closeModal}],extra=""){
+  modalTitle.textContent=title;modalBody.innerHTML=body;modalExtra.innerHTML=extra;modalChoices.innerHTML="";
+  for(const b of buttons){
+    const btn=document.createElement("button");btn.textContent=b.label;btn.className=b.class||"yes";
+    btn.onclick=()=>b.fn();modalChoices.appendChild(btn);
+  }
+  modal.classList.add("show");
+}
+function closeModal(){modal.classList.remove("show")}
+
+async function rollDice(){
+  if(busy||gameOver)return;
+  const p=currentPlayer();
+
+  if(p.skip>0){
+    p.skip--;addLog(`${p.name}은(는) 이번 차례를 쉽니다.`);
+    endTurn();return;
+  }
+
+  busy=true;extraTurn=false;updateHUD();
+
+  die1.classList.add("throwing");die2.classList.add("throwing");
+  for(let i=0;i<10;i++){
+    const a=1+Math.floor(Math.random()*6),b=1+Math.floor(Math.random()*6);
+    setDieValue(die1,a);setDieValue(die2,b);
+    await wait(65);
+  }
+  dice=[1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6)];
+  setDieValue(die1,dice[0]);setDieValue(die2,dice[1]);
+  await wait(220);
+  die1.classList.remove("throwing");die2.classList.remove("throwing");
+  const steps=dice[0]+dice[1],isDouble=dice[0]===dice[1];
+
+  addLog(`${p.name}: ${dice[0]} + ${dice[1]} = ${steps}${isDouble?" · 더블!":""}`);
+
+  if(p.inJail){
+    p.jailTurns++;
+    if(isDouble){
+      p.inJail=false;p.jailTurns=0;
+      addLog(`🔓 ${p.name} 더블로 격리섬 즉시 탈출!`);
+      extraTurn=false; // jail escape double does not chain another extra turn
+      await movePlayer(p,steps);
+      await resolveSpace(p);
+      return;
+    }
+    if(p.jailTurns<3){
+      showModal("🏝️ 격리섬",`${p.name}은(는) 아직 탈출하지 못했습니다.<br><b>${p.jailTurns}/3번째 시도</b><br><br>다음 차례에 다시 주사위를 굴려 <b>더블</b>이 나오면 즉시 탈출합니다.`,
+        [{label:"다음 차례",class:"yes",fn:()=>{closeModal();endTurn()}}]);
+      return;
+    }
+    p.inJail=false;p.jailTurns=0;
+    addLog(`🏝️ ${p.name} 3번째 시도 후 격리섬 자동 석방.`);
+    await movePlayer(p,steps);
+    await resolveSpace(p);
+    return;
+  }
+
+  extraTurn=isDouble;
+  await movePlayer(p,steps);
+  await resolveSpace(p);
+}
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+
+async function focusSpace(index,p){
+  const el=board.querySelector(`.space[data-i="${index}"]`);
+  if(!el)return;
+  board.classList.remove("camera-focus");
+  void board.offsetWidth;
+  board.classList.add("camera-focus");
+  el.style.setProperty("--focus-color",p?.color||"#8ae5ff");
+  el.classList.add("focus-space");
+  await wait(270);
+  el.classList.remove("focus-space");
+  setTimeout(()=>board.classList.remove("camera-focus"),300);
+}
+
+async function movePlayer(p,steps){
+  for(let i=0;i<steps;i++){
+    p.pos=(p.pos+1)%spaces.length;
+    if(p.pos===0){p.cash+=2000;addLog(`${p.name} START 통과: 혁신지원금 +$2,000`)}
+    renderTokens();updateHUD();
+    await focusSpace(p.pos,p);
+    await wait(55);
+  }
+}
+
+async function resolveSpace(p){
+  const s=spaces[p.pos];
+
+  if(s.type==="city")return resolveCity(p,s);
+  if(s.type==="ai")return drawAI(p);
+
+  if(s.type==="jail"){
+    p.inJail=true;p.jailTurns=0;extraTurn=false;
+    addLog(`🏝️ ${p.name} 격리섬에 들어갔습니다.`);
+    showModal("🏝️ 격리섬",`최대 <b>3번의 자기 차례</b> 동안 머뭅니다.<br><br>그 전에 주사위가 <b>더블</b>이면 즉시 탈출해 나온 숫자만큼 이동합니다. 더블이 없어도 3번째 시도 후 자동 석방됩니다.`,
+      [{label:"알겠습니다",class:"yes",fn:()=>{closeModal();endTurn()}}]);
+    return;
+  }
+
+  if(s.type==="rocket"){
+    return rocketTravel(p);
+  }
+
+  if(s.type==="rest"){
+    p.cash+=300;addLog(`${p.name} 스마트 휴게소: +$300`);
+    showModal("☕ 스마트 휴게소","지역 상권 쿠폰과 충전 리워드를 받았습니다. <span class='money'>+$300</span>",
+      [{label:"좋아요",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);updateHUD();return;
+  }
+
+  if(s.type==="fund"){
+    await payBank(p,450,"지역 상생기금");
+    if(!p.out)showModal("🌱 지역 상생기금",`지역 프로젝트에 <span class="money">$450</span>를 기부했습니다.`,
+      [{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+    return;
+  }
+
+  addLog(`${p.name} START 도착`);
+  finishActionTurn();
+}
+
+function rocketTravel(p){
+  const choices=spaces.map((s,i)=>({s,i})).filter(x=>x.s.type==="city"||x.s.type==="start");
+  const extra=`<div class="sell-list">${choices.map(x=>`<button class="sellbtn rocketDest" data-pos="${x.i}"><span>${x.s.type==="start"?"🏁":"📍"} ${x.s.name}</span><b>${x.s.type==="city"?money(x.s.price):"START"}</b></button>`).join("")}</div>`;
+  showModal("🚀 나로-X 우주항","우주 셔틀을 타고 <b>원하는 지역으로 즉시 이동</b>할 수 있습니다.<br>START를 목적지로 선택해도 통과 월급은 추가 지급되지 않습니다.",[],extra);
+  modalExtra.querySelectorAll(".rocketDest").forEach(btn=>{
+    btn.onclick=async()=>{
+      closeModal();
+      p.pos=+btn.dataset.pos;
+      renderTokens();updateHUD();
+      await focusSpace(p.pos,p);
+      addLog(`🚀 ${p.name} 나로-X로 ${spaces[p.pos].name} 이동`);
+      if(spaces[p.pos].type==="start")finishActionTurn();
+      else await resolveSpace(p);
+    };
+  });
+}
+
+function finishActionTurn(){
+  checkSecondHalf();
+  if(modal.classList.contains("show")) return;
+  if(extraTurn&&!currentPlayer().out&&!currentPlayer().inJail){
+    extraTurn=false;busy=false;updateHUD();
+    addLog(`🎲 ${currentPlayer().name} 더블 보너스! 한 번 더 굴립니다.`);
+    showModal("🎲 더블! 한 번 더",`${currentPlayer().name}이(가) 더블을 만들었습니다.<br><b>한 번 더 주사위를 굴릴 수 있습니다.</b>`,
+      [{label:"한 번 더!",class:"yes",fn:()=>{closeModal();busy=false;updateHUD()}}]);
+  }else endTurn();
+}
+
+function resolveCity(p,s){
+  if(s.owner==null){
+    if(p.cash>=s.price){
+      showModal(`📍 ${s.name}`,`새 지역 상권입니다.<br>매입가 <span class="money">${money(s.price)}</span><br><br>매입하면 이후 이곳에 마트·카페거리·주유/EV 충전소·복합상권을 단계적으로 개발할 수 있습니다.`,
+        [
+          {label:"매입",class:"yes",fn:()=>{p.cash-=s.price;s.owner=p.id;addLog(`${p.name}이(가) ${s.name} 매입 ${money(s.price)}`);closeModal();renderBoardData();updateHUD();
+            if(!checkSecondHalf())finishActionTurn()}},
+          {label:"패스",class:"no",fn:()=>{addLog(`${p.name}이(가) ${s.name} 매입을 보류했습니다.`);closeModal();finishActionTurn()}}
+        ]);
+    }else{
+      addLog(`${p.name}: ${s.name} 매입 자금 부족`);
+      showModal(`📍 ${s.name}`,`매입가 ${money(s.price)}가 필요하지만 현재 현금이 부족합니다.`,[{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+    }
+    return;
+  }
+  if(s.owner===p.id){
+    if(!secondHalf){
+      showModal(`🏷️ ${s.name}`,`이곳은 ${p.name}의 땅입니다.<br><br>아직 <b>전반전</b>이라 개발은 잠겨 있습니다. 전체 도시의 70%가 매각되면 후반전이 시작되어 건물을 지을 수 있습니다.`,
+        [{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+      return;
+    }
+    if(s.dev>=4){
+      showModal(`🏬 ${s.name}`,`이미 최고 단계인 <b>스마트 복합상권</b>까지 개발되었습니다.`,[{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);return;
+    }
+    const cost=upgradeCost(s),next=s.dev+1;
+    if(p.cash>=cost){
+      showModal(`🛠️ ${s.name} 개발`,`${DEV_ICONS[next]} <b>${DEV_NAMES[next]}</b> 단계로 발전시키겠습니까?<br>개발비 <span class="money">${money(cost)}</span><br>예상 이용료 ${money(projectedToll(s,next,p))}`,
+        [
+          {label:"개발",class:"yes",fn:()=>{p.cash-=cost;s.dev++;addLog(`${p.name}: ${s.name} → ${DEV_NAMES[s.dev]}`);closeModal();renderBoardData();updateHUD();finishActionTurn()}},
+          {label:"이번엔 안 함",class:"no",fn:()=>{closeModal();finishActionTurn()}}
+        ]);
+    }else{
+      showModal(`🛠️ ${s.name}`,`다음 개발에는 ${money(cost)}가 필요합니다. 현재 현금이 부족합니다.`,[{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+    }
+    return;
+  }
+  const owner=players.find(x=>x.id===s.owner);
+  if(!secondHalf){
+    showModal(`🤝 ${s.name}`,`${owner.name}이(가) 보유한 지역입니다.<br><br>아직 전반전이므로 <b>통행세와 건물세는 없습니다.</b>`,
+      [{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+    return;
+  }
+  const fees=feeBreakdown(s),fee=fees.total;
+  payPlayer(p,owner,fee,`${s.name} 통행세·건물세`).then(()=>{
+    if(!p.out)showModal(`💳 ${s.name} 요금`,`소유자 ${owner.name}에게 지불합니다.<br><br>통행세 <b>${money(fees.land)}</b><br>건물세 <b>${money(fees.building)}</b><br>합계 <span class="money">${money(fee)}</span>${ownsFullGroup(owner,s.group)?"<br><b>지역 시너지 +30%</b> 적용":""}`,
+      [{label:"확인",class:"yes",fn:()=>{closeModal();finishActionTurn()}}]);
+  });
+}
+function projectedToll(s,dev,p){
+  const old=s.dev;s.dev=dev;const n=toll(s);s.dev=old;return n;
+}
+
+async function payBank(p,amount,reason){
+  if(p.cash>=amount){p.cash-=amount;addLog(`${p.name}: ${reason} -${money(amount)}`);updateHUD();return true}
+  return handleShortfall(p,amount,null,reason);
+}
+async function payPlayer(p,to,amount,reason){
+  if(p.cash>=amount){p.cash-=amount;to.cash+=amount;addLog(`${p.name} → ${to.name}: ${reason} ${money(amount)}`);updateHUD();return true}
+  return handleShortfall(p,amount,to,reason);
+}
+
+function handleShortfall(p,amount,to,reason){
+  return new Promise(resolve=>{
+    const need=amount-p.cash;
+    const owned=spaces.filter(s=>s.type==="city"&&s.owner===p.id);
+    if(!owned.length){
+      bankrupt(p,to,reason);resolve(false);return;
+    }
+    const extra=`<div class="sell-list">${owned.map((s,i)=>`<button class="sellbtn" data-si="${spaces.indexOf(s)}"><span>${s.name} · ${DEV_NAMES[s.dev]}</span><b>${money(resale(s))}</b></button>`).join("")}</div>`;
+    showModal("⚠️ 현금 부족",`${reason}으로 ${money(amount)}가 필요합니다.<br>현재 ${money(p.cash)}, 부족액 <span class="money">${money(need)}</span><br><br>도시를 긴급 정리하면 평가액의 일부를 현금화합니다.`,[],extra);
+    modalChoices.innerHTML=`<button class="yes" id="retryPay">지불 재시도</button><button class="no" id="declareBankrupt">파산 선언</button>`;
+    modalExtra.querySelectorAll(".sellbtn").forEach(btn=>{
+      btn.onclick=()=>{
+        const s=spaces[+btn.dataset.si],v=resale(s);
+        p.cash+=v;s.owner=null;s.dev=0;addLog(`${p.name}: ${s.name} 긴급 정리 +${money(v)}`);
+        renderBoardData();updateHUD();btn.remove();
+      };
+    });
+    document.getElementById("retryPay").onclick=()=>{
+      if(p.cash<amount){alert("아직 현금이 부족합니다.");return}
+      p.cash-=amount;if(to)to.cash+=amount;addLog(`${p.name}: ${reason} ${money(amount)} 지불`);
+      closeModal();updateHUD();resolve(true);
+    };
+    document.getElementById("declareBankrupt").onclick=()=>{closeModal();bankrupt(p,to,reason);resolve(false)};
+  });
+}
+
+function bankrupt(p,to,reason){
+  p.out=true;
+  for(const s of spaces)if(s.type==="city"&&s.owner===p.id){s.owner=null;s.dev=0}
+  p.cash=0;renderBoardData();updateHUD();
+  addLog(`${p.name} 파산: ${reason}`);
+  const alive=activePlayers();
+  if(alive.length===1){finishGame(alive[0],`${alive[0].name}만 생존했습니다.`);return}
+  showModal("💥 파산",`${p.name}이(가) 자금을 마련하지 못해 시장에서 철수합니다.`,[{label:"계속",class:"yes",fn:()=>{closeModal();endTurn()}}]);
+}
+
+function drawAI(p){
+  const c=aiCards[Math.floor(Math.random()*aiCards.length)];
+  let detail="";
+  if(c.money){
+    p.cash+=c.money;detail=`<br><span class="money">${c.money>0?"+":""}${money(c.money)}</span>`;
+    if(p.cash<0){p.cash=0}
+  }
+  if(c.perCity){
+    const gain=cityCount(p)*c.perCity;p.cash+=gain;detail=`<br><span class="money">+${money(gain)}</span>`;
+  }
+  if(c.skip)p.skip+=c.skip;
+  if(c.freeUpgrade){
+    if(!secondHalf){
+      p.cash+=400;
+      detail="<br>아직 전반전이라 건설 대신 <span class='money'>+$400</span> 준비 지원금을 받습니다.";
+    }else{
+      const owned=spaces.filter(s=>s.type==="city"&&s.owner===p.id&&s.dev<4).sort((a,b)=>a.dev-b.dev);
+      if(owned.length){owned[0].dev++;detail=`<br>${owned[0].name} → ${DEV_NAMES[owned[0].dev]} 무료 업그레이드!`;renderBoardData()}
+      else detail="<br>업그레이드 가능한 보유 도시가 없어 효과가 지나갑니다.";
+    }
+  }
+  addLog(`${p.name} AI 찬스: ${c.t}`);
+  updateHUD();
+  showModal("🤖✨ AI 찬스",`${c.t}${detail}`,[{label:"확인",class:"yes",fn:async()=>{
+    closeModal();
+    if(c.move){busy=true;await movePlayer(p,c.move);await resolveSpace(p)}
+    else finishActionTurn();
+  }}]);
+}
+
+function showAssets(){
+  const p=currentPlayer();
+  const owned=spaces.filter(s=>s.type==="city"&&s.owner===p.id);
+  const extra=owned.length?`<div class="sell-list">${owned.map(s=>`<div class="sellbtn"><span>${s.name}<br><small>${DEV_ICONS[s.dev]} ${DEV_NAMES[s.dev]}</small></span><b>${money(s.price)}<br><small>이용료 ${money(toll(s))}</small></b></div>`).join("")}</div>`:"<p>아직 보유 도시가 없습니다.</p>";
+  showModal(`💼 ${p.name} 자산`,`현금 <span class="money">${money(p.cash)}</span><br>총자산 <span class="money">${money(totalAssets(p))}</span>`,[{label:"닫기",class:"yes",fn:closeModal}],extra);
+}
+
+function endTurn(){
+  busy=false;extraTurn=false;
+  if(gameOver)return;
+  let next=current;
+  do{next=(next+1)%players.length}while(players[next].out&&next!==current);
+  current=next;turn++;updateHUD();
+}
+
+function finishByAssets(){
+  if(!players.length||gameOver)return;
+  const ranking=[...activePlayers()].sort((a,b)=>totalAssets(b)-totalAssets(a));
+  const lines=ranking.map((p,i)=>`${i+1}위 ${p.car} ${p.name} — ${money(totalAssets(p))}`).join("<br>");
+  finishGame(ranking[0],"자산 정산 결과<br><br>"+lines);
+}
+function finishGame(winner,reason){
+  gameOver=true;busy=true;updateHUD();
+  const best=totalAssets(winner);
+  const old=+(localStorage.getItem("kcityHighAsset")||0);
+  if(best>old)localStorage.setItem("kcityHighAsset",best);
+  showModal("🏆 "+winner.name+" 승리!",`${reason}<br><br><b>${winner.car} ${winner.carName}</b><br>최종 총자산 <span class="money">${money(best)}</span><br>기록 최고자산 ${money(Math.max(old,best))}`,
+    [{label:"새 게임",class:"yes",fn:()=>{closeModal();document.getElementById("setupModal").classList.add("show")}}]);
+}
+
+document.querySelectorAll(".num").forEach(btn=>btn.onclick=()=>{
+  playerCount=+btn.dataset.n;document.querySelectorAll(".num").forEach(x=>x.classList.toggle("active",x===btn))
+});
+document.getElementById("startBtn").onclick=()=>{
+  document.getElementById("setupModal").classList.remove("show");resetData()
+};
+rollBtn.onclick=rollDice;
+manageBtn.onclick=showAssets;
+document.getElementById("settleBtn").onclick=()=>{if(confirm("현재 총자산으로 게임을 끝내고 승자를 정할까요?"))finishByAssets()};
+document.getElementById("restartBtn").onclick=()=>{if(confirm("현재 게임을 종료하고 새 게임을 시작할까요?"))document.getElementById("setupModal").classList.add("show")};
+
+})();
+</script>
+</body>
+</html>
